@@ -311,7 +311,7 @@ const PrivacyPolicyPage: React.FC<PrivacyPolicyPageProps> = ({ className }) => {
             <li className="pb-5">
               <strong>Sharing content with friends or colleagues.</strong> For
               example, RenewMe may allow you to provide information about your
-              friends through our "Tell a Friend" referral services. This
+              friends through our "Tell a Friend\" referral services. This
               service may allow you to forward or share certain content with a
               friend or colleague, such as an email inviting your friend to use
               our Services. Email addresses that you may provide for a friend or
