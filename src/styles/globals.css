@@ -1,0 +1,348 @@
+@import "tailwindcss";
+@import url("https://fonts.googleapis.com/css2?family=Urbanist:ital,wght@0,100..900;1,100..900&display=swap");
+
+@font-face {
+  font-family: "Gilroy";
+  font-weight: 200;
+  font-style: normal;
+  src: url("/fonts/Gilroy-Thin.otf") format("opentype");
+}
+
+@font-face {
+  font-family: "Gilroy";
+  font-weight: 300;
+  font-style: normal;
+  src: url("/fonts/Gilroy-Light.otf") format("opentype");
+}
+
+@font-face {
+  font-family: "Gilroy";
+  font-weight: 400;
+  font-style: normal;
+  src: url("/fonts/Gilroy-Regular.otf") format("opentype");
+}
+
+@font-face {
+  font-family: "Gilroy";
+  font-weight: 500;
+  font-style: normal;
+  src: url("/fonts/Gilroy-Medium.otf") format("opentype");
+}
+
+@font-face {
+  font-family: "Gilroy";
+  font-weight: 600;
+  font-style: normal;
+  src: url("/fonts/Gilroy-Semibold.otf") format("opentype");
+}
+
+@font-face {
+  font-family: "Gilroy";
+  font-weight: 700;
+  font-style: normal;
+  src: url("/fonts/Gilroy-Bold.otf") format("opentype");
+}
+
+@font-face {
+  font-family: "Urbanist";
+  font-weight: 400;
+  font-style: normal;
+  src: url("/fonts/Urbanist-Regular.otf") format("opentype");
+}
+
+@font-face {
+  font-family: "Urbanist";
+  font-weight: 500;
+  font-style: normal;
+  src: url("/fonts/Urbanist-Medium.ttf") format("opentype");
+}
+
+@font-face {
+  font-family: "Urbanist";
+  font-weight: 600;
+  font-style: normal;
+  src: url("/fonts/Urbanist-SemiBold.otf") format("opentype");
+}
+
+@font-face {
+  font-family: "Urbanist";
+  font-weight: 700;
+  font-style: normal;
+  src: url("/fonts/Urbanist-Bold.ttf") format("opentype");
+}
+
+@font-face {
+  font-family: "Urbanist";
+  font-weight: 800;
+  font-style: normal;
+  src: url("/fonts/Urbanist-Black.ttf") format("opentype");
+}
+
+* {
+  font-family: "Urbanist";
+}
+
+.review-slider .slick-track {
+  display: flex;
+  gap: 31px;
+  padding-bottom: 20px;
+}
+
+@media (max-width: 576px) {
+  .review-slider .slick-track {
+    gap: 14px;
+  }
+}
+
+.loading-overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  min-height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 50;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.loader-wrapper {
+  display: flex;
+  gap: 57px;
+}
+
+.loader-ball {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  animation-duration: 1.2s;
+  animation-iteration-count: infinite;
+  animation-timing-function: ease-in-out;
+}
+
+.ball1 {
+  background-color: #f0f0f0;
+  animation-name: pulseAlt1;
+}
+
+.ball2 {
+  background-color: #c8c8c8;
+  animation-name: pulseAlt2;
+}
+
+@keyframes pulseAlt1 {
+
+  0%,
+  100% {
+    background-color: #f0f0f0;
+  }
+
+  50% {
+    background-color: #c8c8c8;
+  }
+}
+
+@keyframes pulseAlt2 {
+
+  0%,
+  100% {
+    background-color: #c8c8c8;
+  }
+
+  50% {
+    background-color: #f0f0f0;
+  }
+}
+
+.swiper {
+  width: 100%;
+}
+
+.swiper-slide {
+  width: auto;
+}
+
+/*.custom-style.rap-container {
+  background-color: #000000;
+  background-image: linear-gradient(147deg, #000000 0%, #04619f 74%);
+  color: aliceblue;
+}
+
+.custom-style.rap-container .rap-pp-icon path,
+.custom-style.rap-container .rap-volume-btn path {
+  fill: white;
+}
+
+.custom-style.rap-container .rap-slider .rap-progress {
+  background-color: #daecff;
+}
+
+.custom-style.rap-container .rap-volume .rap-volume-controls {
+  background-color: #000000;
+  background-image: linear-gradient(147deg, #000000 0%, #04619f 74%);
+}
+
+.custom-style.rap-container .rap-slider .rap-progress .rap-pin {
+  background-color: #c3d5ff;
+  box-shadow: 0 0 9px 7px #269eff52;
+}
+
+.custom-style.rap-container svg.rap-pp-icon:hover,
+.custom-style.rap-container .rap-volume-btn svg:hover {
+  filter: drop-shadow(0px 0px 6px rgba(255, 255, 255, 0.9));
+}*/
+
+
+
+
+.rap-container {
+  max-width: auto;
+  height: auto;
+  box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.07);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  user-select: none;
+  -webkit-user-select: none;
+  color: #55606e;
+}
+.rap-container:focus {
+  outline: none;
+}
+.rap-container .rap-current-time,
+.rap-container .rap-total-time {
+  min-width: 40px;
+}
+.rap-container .rap-total-time {
+  text-align: right;
+}
+.rap-container .rap-pp-button {
+  cursor: pointer;
+}
+.rap-container .rap-spinner {
+  width: 18px;
+  height: 18px;
+  background-image: url('/assets/images/landing/loading.png');
+  background-size: cover;
+  background-repeat: no-repeat;
+  animation: rapSpin 0.4s linear infinite;
+}
+.rap-container .rap-slider {
+  flex-grow: 1;
+  background-color: #d8d8d8;
+  cursor: pointer;
+  position: relative;
+}
+.rap-container .rap-slider .rap-progress {
+  background-color: #007fff;
+  border-radius: inherit;
+  position: absolute;
+  pointer-events: none;
+}
+.rap-container .rap-slider .rap-progress .rap-pin {
+  height: 16px;
+  width: 16px;
+  border-radius: 8px;
+  background-color: #007fff;
+  position: absolute;
+  pointer-events: all;
+  box-shadow: 0px 1px 1px 0px rgba(0, 0, 0, 0.32);
+}
+.rap-container .rap-controls {
+  font-family: 'Roboto', sans-serif;
+  font-size: 16px;
+  line-height: 18px;
+  display: flex;
+  flex-grow: 1;
+  justify-content: space-between;
+  align-items: center;
+  margin-left: 24px;
+  margin-right: 24px;
+}
+.rap-container .rap-controls .rap-slider {
+  margin-left: 12px;
+  margin-right: 12px;
+  border-radius: 2px;
+  height: 4px;
+}
+.rap-container .rap-controls .rap-slider .rap-progress {
+  width: 0;
+  height: 100%;
+}
+.rap-container .rap-controls .rap-slider .rap-progress .rap-pin {
+  right: -8px;
+  top: -6px;
+}
+.rap-container .rap-controls span {
+  cursor: default;
+}
+.rap-container .rap-volume {
+  position: relative;
+}
+.rap-container .rap-volume .rap-volume-btn {
+  cursor: pointer;
+}
+.rap-container .rap-volume .rap-volume-controls {
+  width: 30px;
+  height: 135px;
+  background-color: rgba(0, 0, 0, 0.62);
+  border-radius: 7px;
+  position: absolute;
+  left: -3px;
+  bottom: 52px;
+  flex-direction: column;
+  align-items: center;
+  display: flex;
+  z-index: 1;
+}
+.rap-container .rap-volume .rap-hidden {
+  display: none;
+}
+.rap-container .rap-volume .rap-vol-placement-top {
+  position: absolute;
+  left: 0;
+  top: 32px;
+}
+
+.rap-container .rap-volume .rap-vol-placement-bottom {
+  position: absolute;
+  left: 0;
+  top: 230px;
+}
+
+.rap-container .rap-volume .rap-volume-controls .rap-slider {
+  margin-top: 12px;
+  margin-bottom: 12px;
+  width: 6px;
+  border-radius: 3px;
+}
+.rap-container .rap-volume .rap-volume-controls .rap-slider .rap-progress {
+  bottom: 0;
+  height: 100%;
+  width: 6px;
+}
+.rap-container .rap-volume .rap-volume-controls .rap-slider .rap-progress .rap-pin {
+  left: -5px;
+  top: -8px;
+}
+
+.rap-container svg {
+  display: block;
+}
+
+.rap-backdrop {
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  top: 0;
+  left: 0;
+}
+
+@keyframes rapSpin {
+  from {
+    transform: rotateZ(0);
+  }
+  to {
+    transform: rotateZ(1turn);
+  }
+}
