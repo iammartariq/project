@@ -131,9 +131,18 @@ const LoginForm = ({
                                  </button>
                               </div>
                               <button className="w-full mt-[27px] py-3 bg-white rounded-full md:text-[22px] text-lg font-semibold hover:opacity-90 transition md:h-[69px] h-[46px] flex items-center justify-center cursor-pointer">
-                                 Continue
+                                 {loading ? 'Signing in...' : 'Continue'}
                               </button>
                            </form>
+                           {errors.email && (
+                              <p className="text-red-400 text-sm mt-2 text-center">{errors.email}</p>
+                           )}
+                           {errors.password && (
+                              <p className="text-red-400 text-sm mt-2 text-center">{errors.password}</p>
+                           )}
+                           {errors.termsIsChecked && (
+                              <p className="text-red-400 text-sm mt-2 text-center">{errors.termsIsChecked}</p>
+                           )}
                            <p className="text-white text-[18px] font-medium text-center mt-[27px]">
                               Don’t have a Renewme account?{" "}
                               <button

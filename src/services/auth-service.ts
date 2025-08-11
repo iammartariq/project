@@ -62,11 +62,16 @@ export const registerUser = async (data: RegisterData) => {
 
 export const signInUser = async (data: SignInData): Promise<AuthResponse> => {
   try {
+    console.log('Attempting login with:', { email: data.email, password: '[REDACTED]' });
+    console.log('GraphQL URL:', process.env.NEXT_PUBLIC_GRAPHQL_URL);
+    
     const response = await client.mutate({
       mutation: SIGN_IN,
       variables: data,
     });
 
+    console.log('GraphQL response:', response);
+    
     const authToken = response.data.signIn.user?.authToken;
     
     if (authToken) {
@@ -76,6 +81,10 @@ export const signInUser = async (data: SignInData): Promise<AuthResponse> => {
 
     return response.data.signIn;
   } catch (error) {
+    console.error('Login error details:', error);
+    console.error('Error message:', error.message);
+    console.error('Network error:', error.networkError);
+    console.error('GraphQL errors:', error.graphQLErrors);
     return { errors: 'Login failed' };
   }
 };

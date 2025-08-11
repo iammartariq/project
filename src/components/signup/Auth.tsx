@@ -90,11 +90,18 @@ const Auth = ({ open, setOpen }: any) => {
 
    const handleLogin = async (e: React.FormEvent) => {
       e.preventDefault();
-      console.log("validate()", validate());
-      console.log("newErrors", errors);
+      console.log("Login form data:", { email: form.email, password: '[REDACTED]' });
+      console.log("Validation result:", validate());
+      console.log("Validation errors:", errors);
+      
       if (!validate()) return;
+      
+      setLoading(true);
       await signInUser(form).then((result) => {
+         console.log("Login result:", result);
+         setLoading(false);
          if (result.errors) {
+            console.error("Login failed with error:", result.errors);
             toast.error(result.errors);
          } else {
             toast.success("Logged in successfully!");
