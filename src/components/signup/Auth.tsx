@@ -21,8 +21,8 @@ const initialState = {
 };
 
 const Auth = ({ open, setOpen }: any) => {
-      const [isTermsOpen, setIsTermsOpen] = useState(false);
-      const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
+   const [isTermsOpen, setIsTermsOpen] = useState(false);
+   const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
 
    const router = useRouter();
    const { login, checkAuthenticate, isAuthenticated } = useAuthStore();
@@ -74,10 +74,16 @@ const Auth = ({ open, setOpen }: any) => {
    const handleSignup = async (e: React.FormEvent) => {
       e.preventDefault();
       console.log("validate()", validate());
-      console.log("newErrors", errors);
+      console.log("validation errors", errors);
       if (!validate()) return;
-      await registerUser(form).then((result) => {
+      
+      setLoading(true);
+      try {
+         const result = await registerUser(form);
+         setLoading(false);
+         
          if (result.errors) {
+            console.error('Signup error:', result.errors);
             toast.error(result.errors);
          } else {
             toast.success("Signed Up successfully, Please Login!");
@@ -85,7 +91,11 @@ const Auth = ({ open, setOpen }: any) => {
             setIsSignupModalOpen(false);
             setIsAuthModalOpen(true);
          }
-      });
+      } catch (error) {
+         setLoading(false);
+         console.error('Signup failed:', error);
+         toast.error("Registration failed. Please try again.");
+      }
    };
 
    const handleLogin = async (e: React.FormEvent) => {
@@ -97,13 +107,16 @@ const Auth = ({ open, setOpen }: any) => {
       if (!validate()) return;
       
       setLoading(true);
-      await signInUser(form).then((result) => {
-         console.log("Login result:", result);
+      try {
+         const result = await signInUser(form);
          setLoading(false);
+         
+         console.log("Login result:", result);
+         
          if (result.errors) {
             console.error("Login failed with error:", result.errors);
             toast.error(result.errors);
-         } else {
+         } else if (result.user) {
             toast.success("Logged in successfully!");
             login(result.user);
             setForm({ ...initialState });
@@ -111,22 +124,36 @@ const Auth = ({ open, setOpen }: any) => {
             setIsAuthModalOpen(false);
             setOpen(false);
             router.push("/renewme-home");
+         } else {
+            console.error("No user data in successful login result");
+            toast.error("Login failed - no user data received");
          }
-      });
+      } catch (error) {
+         setLoading(false);
+         console.error('Login failed with exception:', error);
+         toast.error("Login failed. Please try again.");
+      }
    };
 
    const handleResetPassword = async (e: React.FormEvent) => {
       e.preventDefault();
-      await forgotPassword(form).then((result) => {
+      setLoading(true);
+      try {
+         const result = await forgotPassword(form);
+         setLoading(false);
+         
          if (result.link && !result.emailSent) {
             toast.error(result.link);
          } else {
             toast.success("Reset Link sent to your email please check!");
             setIsForgotModalOpen(false);
             setIsContinueModalOpen(true);
-            // setForm({ ...initialState });
          }
-      });
+      } catch (error) {
+         setLoading(false);
+         console.error('Reset password failed:', error);
+         toast.error("Reset password failed. Please try again.");
+      }
    };
 
    return (
@@ -180,92 +207,3 @@ const Auth = ({ open, setOpen }: any) => {
                                        setIsSignupModalOpen(true);
                                        setTermsIsChecked(true);
                                     }}
-                                    className="bg-[#A850B2] rounded-full text-[#ffffff] py-[13px] xl:py-[16px] 2xl:py-[21.5px] flex items-center justify-center gap-[20px] cursor-pointer"
-                                 >
-                                    <div className="">
-                                       <Image
-                                          src={
-                                             "/assets/images/renewme-home/svg/mail.svg"
-                                          }
-                                          alt="mail"
-                                          width={24}
-                                          height={24}
-                                       />
-                                    </div>
-                                    <div className="text-[15px] sm:text-[20px] xl:text-[22px] font-semibold xl:leading-[26px]">
-                                       Continue with Email
-                                    </div>
-                                 </button>
-                                 <div className="text-[15px] xl:text-[17px] xl:leading-[24px] text-center">
-                                    By clicking Continue, you agree to our{" "}
-                                    <span
-                                       className="text-[#0066FF] cursor-pointer underline"
-                                       onClick={() => setIsTermsOpen(true)}
-                                    >
-                                       Terms
-                                    </span>{" "}
-                                    and acknowledge that you have read our{" "}
-                                    <span
-                                       className="text-[#0066FF] cursor-pointer underline"
-                                       onClick={() => setIsPrivacyOpen(true)}
-                                    >
-                                       Privacy Policy
-                                    </span>
-                                    , which explains how to opt out of offers
-                                    and promos
-                                 </div>
-                              </div>
-                           </div>
-                        </div>
-                     </div>
-                  </DialogPanel>
-               </div>
-            </div>
-         </Dialog>
-         <SignUpForm
-            isSignupModalOpen={isSignupModalOpen}
-            setIsSignupModalOpen={setIsSignupModalOpen}
-            setIsAuthModalOpen={setIsAuthModalOpen}
-            setIsLoginModalOpen={setIsLoginModalOpen}
-            handleSignup={handleSignup}
-            handleChange={handleChange}
-            form={form}
-            errors={errors}
-            loading={loading}
-            termsIsChecked={termsIsChecked}
-            setTermsIsChecked={setTermsIsChecked}
-         />
-         <LoginAuth
-            setIsSignupModalOpen={setIsSignupModalOpen}
-            isLoginModalOpen={isLoginModalOpen}
-            setIsLoginModalOpen={setIsLoginModalOpen}
-            isAuthModalOpen={isAuthModalOpen}
-            setIsAuthModalOpen={setIsAuthModalOpen}
-            setAuth={setAuth}
-            setOpen={setOpen}
-            handleLogin={handleLogin}
-            handleResetPassword={handleResetPassword}
-            isForgotModalOpen={isForgotModalOpen}
-            setIsForgotModalOpen={setIsForgotModalOpen}
-            isContinueModalOpen={isContinueModalOpen}
-            setIsContinueModalOpen={setIsContinueModalOpen}
-            handleChange={handleChange}
-            form={form}
-            errors={errors}
-            loading={loading}
-            termsIsChecked={termsIsChecked}
-            setTermsIsChecked={setTermsIsChecked}
-         />
-         <TermsModal
-            isOpen={isTermsOpen}
-            onClose={() => setIsTermsOpen(false)}
-         />
-         <PrivacyModal
-            isOpen={isPrivacyOpen}
-            onClose={() => setIsPrivacyOpen(false)}
-         />
-      </>
-   );
-};
-
-export default Auth;
