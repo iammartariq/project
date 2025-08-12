@@ -206,3 +206,6 @@ const Auth = ({ open, setOpen }: any) => {
                                        setIsSignupModalOpen(true);
                                        setTermsIsChecked(true);
                                     }}
+
+   )
+}
