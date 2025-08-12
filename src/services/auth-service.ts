@@ -74,7 +74,6 @@ export const signInUser = async (data: SignInData): Promise<AuthResponse> => {
   try {
     console.log('🔐 Starting authentication process...');
     console.log('📧 Email:', data.email);
-    console.log('🌐 GraphQL URL:', process.env.NEXT_PUBLIC_GRAPHQL_URL);
     
     // Validate environment
     if (!process.env.NEXT_PUBLIC_GRAPHQL_URL) {
@@ -88,8 +87,6 @@ export const signInUser = async (data: SignInData): Promise<AuthResponse> => {
       return { errors: 'Email and password are required' };
     }
     
-    console.log('✅ Validation passed, making GraphQL request...');
-    
     const response = await client.mutate({
       mutation: SIGN_IN,
       variables: data,
@@ -97,10 +94,6 @@ export const signInUser = async (data: SignInData): Promise<AuthResponse> => {
       fetchPolicy: 'no-cache', // Don't use cache for authentication
     });
 
-    console.log('📨 GraphQL response received');
-    console.log('📊 Has data:', !!response.data);
-    console.log('⚠️ Has errors:', !!response.errors);
-    
     // Check for network/GraphQL level errors first
     if (response.errors && response.errors.length > 0) {
       console.error('❌ GraphQL level errors:', response.errors);
@@ -118,16 +111,10 @@ export const signInUser = async (data: SignInData): Promise<AuthResponse> => {
     // Check if signIn field exists in response
     if (!response.data.signIn) {
       console.error('❌ CRITICAL: No signIn field in response');
-      console.error('Available fields:', Object.keys(response.data || {}));
       return { errors: 'Invalid response structure from server' };
     }
     
     const signInResult = response.data.signIn;
-    console.log('🔍 SignIn result structure:', {
-      hasErrors: !!signInResult.errors,
-      hasUser: !!signInResult.user,
-      userEmail: signInResult.user?.email
-    });
     
     // Check for application-level errors
     if (signInResult.errors) {
@@ -142,19 +129,11 @@ export const signInUser = async (data: SignInData): Promise<AuthResponse> => {
     }
     
     const user = signInResult.user;
-    console.log('✅ Authentication successful!', {
-      id: user.id,
-      email: user.email,
-      fullName: user.fullName,
-      subscriptionStatus: user.subscriptionStatus,
-      hasAuthToken: !!user.authToken
-    });
     
     // Handle auth token
     if (user.authToken) {
       try {
         localStorage.setItem('authToken', user.authToken);
-        console.log('💾 Auth token stored successfully');
       } catch (storageError) {
         console.warn('⚠️ Failed to store auth token:', storageError);
         // Don't fail the login just because we can't store the token
@@ -163,24 +142,14 @@ export const signInUser = async (data: SignInData): Promise<AuthResponse> => {
       console.warn('⚠️ WARNING: No auth token provided by server');
     }
 
-    console.log('🎉 Login process completed successfully');
     return signInResult;
 
   } catch (error: any) {
-    console.error('💥 AUTHENTICATION ERROR CAUGHT');
-    console.error('Error details:', {
-      name: error.name,
-      message: error.message,
-      type: typeof error
-    });
+    console.error('Authentication error:', error);
     
     // Handle different types of errors
     if (error.networkError) {
-      console.error('🌐 Network Error:', {
-        name: error.networkError.name,
-        message: error.networkError.message,
-        statusCode: error.networkError.statusCode,
-      });
+      console.error('Network Error:', error.networkError);
       
       // Specific network error handling
       if (error.networkError.statusCode === 404) {
@@ -200,7 +169,7 @@ export const signInUser = async (data: SignInData): Promise<AuthResponse> => {
     
     // Handle GraphQL errors
     if (error.graphQLErrors && error.graphQLErrors.length > 0) {
-      console.error('📋 GraphQL Errors:', error.graphQLErrors);
+      console.error('GraphQL Errors:', error.graphQLErrors);
       const firstGraphQLError = error.graphQLErrors[0];
       return { 
         errors: firstGraphQLError.message || 'GraphQL error occurred' 
@@ -209,7 +178,7 @@ export const signInUser = async (data: SignInData): Promise<AuthResponse> => {
     
     // Handle generic Apollo errors
     if (error.message) {
-      console.error('🔧 Apollo Client Error:', error.message);
+      console.error('Apollo Client Error:', error.message);
       
       // Check for common error patterns
       if (error.message.includes('CORS')) {

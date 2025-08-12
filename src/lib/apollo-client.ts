@@ -29,9 +29,12 @@ const errorLink = onError(({ graphQLErrors, networkError, operation, forward }) 
 // HTTP link
 const httpLink = new HttpLink({
   uri: process.env.NEXT_PUBLIC_GRAPHQL_URL || 'https://api.myrenewme.com/graphql',
-  credentials: 'include', // Important for authentication cookies
+  credentials: 'same-origin',
   headers: {
     'Content-Type': 'application/json',
+    ...(typeof window !== 'undefined' && localStorage.getItem('authToken') && {
+      'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+    })
   }
 });
 
