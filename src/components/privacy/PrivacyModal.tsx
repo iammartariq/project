@@ -1,18 +1,22 @@
-"use client";
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment, useState } from "react";
 import { X } from "lucide-react";
 
-const PrivacyModal = ({ isOpen, onClose }) => {
+interface PrivacyModalProps {
+  open: boolean;
+  setOpen: (open: boolean) => void;
+}
+
+const PrivacyModal = ({ open, setOpen }: PrivacyModalProps) => {
    const [isChecked, setIsChecked] = useState(false);
    return (
-      <Transition appear show={isOpen} as={Fragment}>
-         <Dialog as="div" className="relative z-50" onClose={onClose}>
+      <Transition appear show={open} as={Fragment}>
+         <Dialog as="div" className="relative z-50" onClose={() => setOpen(false)}>
             <div className="fixed inset-0 bg-black/50" />
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
                <Dialog.Panel className="bg-white rounded-xl p-6 relative w-full max-w-5xl  overflow-y-auto">
                   <button
-                     onClick={onClose}
+                     onClick={() => setOpen(false)}
                      className="absolute top-3 right-3 text-gray-700 hover:text-black"
                   >
                      <X size={20} />
@@ -751,7 +755,7 @@ const PrivacyModal = ({ isOpen, onClose }) => {
                      </label>
 
                      <button
-                        onClick={onClose}
+                        onClick={() => setOpen(false)}
                         disabled={!isChecked}
                         className={`px-4 py-2 rounded-md text-white text-sm font-medium ${
                            isChecked

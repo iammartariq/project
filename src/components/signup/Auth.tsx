@@ -20,6 +20,7 @@ const initialState = {
 const Auth = ({ open, setOpen }: { open: boolean; setOpen: (val: boolean) => void }) => {
   const [isTermsOpen, setIsTermsOpen] = useState(false);
   const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
+  const [isSignup, setIsSignup] = useState(true);
 
   const router = useRouter();
   const { login } = useAuthStore();
@@ -37,7 +38,7 @@ const Auth = ({ open, setOpen }: { open: boolean; setOpen: (val: boolean) => voi
   // Validation
   const validate = () => {
     const newErrors: typeof errors = {};
-    if (form.fullName && form.fullName.trim().length < 3) {
+    if (isSignup && form.fullName && form.fullName.trim().length < 3) {
       newErrors.fullName = "Full name must be at least 3 characters long";
     }
     if (!/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(form.email)) {
@@ -165,32 +166,114 @@ const Auth = ({ open, setOpen }: { open: boolean; setOpen: (val: boolean) => voi
                     <div className="bg-white rounded-[28px] pt-[50px] pb-[23px] xl:py-[60px] 2xl:py-[126px] px-[23px] xl:px-[30px] 2xl:px-[47px] flex flex-col gap-[30px] sm:gap-[41px]">
                       <div className="flex flex-col items-center gap-[5px] sm:gap-[12px] xl:gap-[17px]">
                         <div className="text-[20px] sm:text-[24px] xl:text-[26px] 2xl:text-[28px] font-semibold leading-[28px] text-center">
-                          Create a free account to save your preferences
+                          {isSignup ? 'Create a free account to save your preferences' : 'Welcome back to RenewMe'}
                         </div>
                         <div className="sm:text-[20px] xl:leading-[28px]">
-                          Have a Renewme account?{" "}
+                          {isSignup ? 'Have a Renewme account?' : "Don't have a Renewme account?"}{" "}
                           <span
                             onClick={() => {
-                              toast.info("Switch to login form here");
+                              setIsSignup(!isSignup);
+                              setErrors({});
+                              setForm(initialState);
                             }}
                             className="text-[#0066FF] cursor-pointer underline"
                           >
-                            Log in
+                            {isSignup ? 'Log in' : 'Sign up'}
                           </span>
                         </div>
                       </div>
 
-                      {/* Sign Up button */}
-                      <button
-                        onClick={() => {
-                          toast.info("Open signup modal here");
-                          setTermsIsChecked(true);
-                        }}
-                        className="bg-blue-500 text-white px-6 py-3 rounded-lg"
-                        disabled={loading}
-                      >
-                        {loading ? "Processing..." : "Sign Up"}
-                      </button>
+                      <form onSubmit={isSignup ? handleSignup : handleLogin} className="space-y-4">
+                        {isSignup && (
+                          <div className="relative">
+                            <input
+                              type="text"
+                              name="fullName"
+                              value={form.fullName}
+                              onChange={handleChange}
+                              placeholder="What should we call you?"
+                              className="w-full py-3 px-4 pl-12 h-12 rounded-full bg-gray-100 border border-gray-300 text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            />
+                            <span className="absolute left-4 top-1/2 transform -translate-y-1/2">
+                              👤
+                            </span>
+                            {errors.fullName && (
+                              <p className="text-red-500 text-sm mt-1">{errors.fullName}</p>
+                            )}
+                          </div>
+                        )}
+                        
+                        <div className="relative">
+                          <input
+                            type="email"
+                            name="email"
+                            value={form.email}
+                            onChange={handleChange}
+                            placeholder="Enter your email"
+                            className="w-full py-3 px-4 pl-12 h-12 rounded-full bg-gray-100 border border-gray-300 text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                          />
+                          <span className="absolute left-4 top-1/2 transform -translate-y-1/2">
+                            ✉️
+                          </span>
+                          {errors.email && (
+                            <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+                          )}
+                        </div>
+                        
+                        <div className="relative">
+                          <input
+                            type="password"
+                            name="password"
+                            value={form.password}
+                            onChange={handleChange}
+                            placeholder="Enter password"
+                            className="w-full py-3 px-4 pl-12 h-12 rounded-full bg-gray-100 border border-gray-300 text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                          />
+                          <span className="absolute left-4 top-1/2 transform -translate-y-1/2">
+                            🔒
+                          </span>
+                          {errors.password && (
+                            <p className="text-red-500 text-sm mt-1">{errors.password}</p>
+                          )}
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            id="terms"
+                            checked={termsIsChecked}
+                            onChange={(e) => setTermsIsChecked(e.target.checked)}
+                            className="rounded"
+                          />
+                          <label htmlFor="terms" className="text-sm">
+                            I agree to the{" "}
+                            <span
+                              onClick={() => setIsTermsOpen(true)}
+                              className="text-blue-600 cursor-pointer underline"
+                            >
+                              Terms
+                            </span>{" "}
+                            and{" "}
+                            <span
+                              onClick={() => setIsPrivacyOpen(true)}
+                              className="text-blue-600 cursor-pointer underline"
+                            >
+                              Privacy Policy
+                            </span>
+                          </label>
+                        </div>
+                        {errors.termsIsChecked && (
+                          <p className="text-red-500 text-sm">{errors.termsIsChecked}</p>
+                        )}
+
+                        <button
+                          type="submit"
+                          disabled={loading}
+                          className="w-full bg-[#A850B2] text-white py-3 rounded-full text-lg font-semibold hover:opacity-90 transition disabled:opacity-50"
+                        >
+                          {loading ? "Processing..." : (isSignup ? "Sign Up" : "Sign In")}
+                        </button>
+                      </form>
                     </div>
                   </div>
                 </div>
