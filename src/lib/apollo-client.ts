@@ -1,24 +1,27 @@
 import { ApolloClient, HttpLink, InMemoryCache, from } from '@apollo/client';
 import { onError } from '@apollo/client/link/error';
 
-console.log('GraphQL URL from env:', process.env.NEXT_PUBLIC_GRAPHQL_URL);
+console.log('🔧 Apollo Client Configuration:');
+console.log('📍 GraphQL URL:', process.env.NEXT_PUBLIC_GRAPHQL_URL);
 
 // Error handling link
 const errorLink = onError(({ graphQLErrors, networkError, operation, forward }) => {
   if (graphQLErrors) {
     graphQLErrors.forEach(({ message, locations, path }) =>
       console.error(
-        `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`
+        `📋 GraphQL Error: ${message}`, 
+        { locations, path, operation: operation.operationName }
       )
     );
   }
   
   if (networkError) {
-    console.error(`[Network error]: ${networkError}`);
-    console.error('Network error details:', {
+    console.error(`🌐 Network Error: ${networkError.message}`);
+    console.error('🔍 Network error details:', {
       name: networkError.name,
       message: networkError.message,
       statusCode: (networkError as any).statusCode,
+      result: (networkError as any).result
     });
   }
 });
@@ -26,8 +29,13 @@ const errorLink = onError(({ graphQLErrors, networkError, operation, forward }) 
 // HTTP link
 const httpLink = new HttpLink({
   uri: process.env.NEXT_PUBLIC_GRAPHQL_URL || 'https://api.myrenewme.com/graphql',
-  credentials: 'include',
+  credentials: 'include', // Important for authentication cookies
+  headers: {
+    'Content-Type': 'application/json',
+  }
 });
+
+console.log('✅ Apollo Client initialized with URL:', httpLink.options.uri);
 
 // Combine links
 const link = from([errorLink, httpLink]);

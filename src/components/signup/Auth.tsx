@@ -100,9 +100,7 @@ const Auth = ({ open, setOpen }: any) => {
 
    const handleLogin = async (e: React.FormEvent) => {
       e.preventDefault();
-      console.log("Login form data:", { email: form.email, password: '[REDACTED]' });
-      console.log("Validation result:", validate());
-      console.log("Validation errors:", errors);
+      console.log("🔐 Login attempt for:", form.email);
       
       if (!validate()) return;
       
@@ -111,13 +109,14 @@ const Auth = ({ open, setOpen }: any) => {
          const result = await signInUser(form);
          setLoading(false);
          
-         console.log("Login result:", result);
+         console.log("📨 Login result received:", !!result.user ? 'Success' : 'Failed');
          
          if (result.errors) {
-            console.error("Login failed with error:", result.errors);
+            console.error("❌ Login failed:", result.errors);
             toast.error(result.errors);
          } else if (result.user) {
-            toast.success("Logged in successfully!");
+            console.log("✅ Login successful, redirecting...");
+            toast.success("Welcome back!");
             login(result.user);
             setForm({ ...initialState });
             setIsSignupModalOpen(false);
@@ -125,12 +124,12 @@ const Auth = ({ open, setOpen }: any) => {
             setOpen(false);
             router.push("/renewme-home");
          } else {
-            console.error("No user data in successful login result");
+            console.error("❌ CRITICAL: No user data received");
             toast.error("Login failed - no user data received");
          }
       } catch (error) {
          setLoading(false);
-         console.error('Login failed with exception:', error);
+         console.error('💥 Login exception:', error);
          toast.error("Login failed. Please try again.");
       }
    };
