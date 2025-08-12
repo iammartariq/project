@@ -74,6 +74,7 @@ export const signInUser = async (data: SignInData): Promise<AuthResponse> => {
   try {
     console.log('🔐 Starting authentication process...');
     console.log('📧 Email:', data.email);
+    console.log('🌐 GraphQL URL:', process.env.NEXT_PUBLIC_GRAPHQL_URL);
     
     // Validate environment
     if (!process.env.NEXT_PUBLIC_GRAPHQL_URL) {
@@ -85,6 +86,31 @@ export const signInUser = async (data: SignInData): Promise<AuthResponse> => {
     if (!data.email || !data.password) {
       console.error('❌ CRITICAL: Missing email or password');
       return { errors: 'Email and password are required' };
+    }
+    
+    // Test basic connectivity first
+    try {
+      const testResponse = await fetch(process.env.NEXT_PUBLIC_GRAPHQL_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          query: `query { __typename }`
+        })
+      });
+      
+      if (!testResponse.ok) {
+        console.error('❌ Basic connectivity test failed:', testResponse.status, testResponse.statusText);
+        return { errors: `Server connectivity issue: ${testResponse.status} ${testResponse.statusText}` };
+      }
+      
+      console.log('✅ Basic connectivity test passed');
+    } catch (connectivityError: any) {
+      console.error('❌ Connectivity test failed:', connectivityError);
+      return { errors: `Cannot connect to server: ${connectivityError.message}` };
     }
     
     const response = await client.mutate({
@@ -129,11 +155,13 @@ export const signInUser = async (data: SignInData): Promise<AuthResponse> => {
     }
     
     const user = signInResult.user;
+    console.log('✅ Authentication successful for user:', user.email);
     
     // Handle auth token
     if (user.authToken) {
       try {
         localStorage.setItem('authToken', user.authToken);
+        console.log('✅ Auth token stored successfully');
       } catch (storageError) {
         console.warn('⚠️ Failed to store auth token:', storageError);
         // Don't fail the login just because we can't store the token
@@ -161,6 +189,12 @@ export const signInUser = async (data: SignInData): Promise<AuthResponse> => {
       if (error.networkError.statusCode === 0) {
         return { errors: 'Unable to connect to server. Check your internet connection.' };
       }
+      if (error.networkError.message?.includes('CORS')) {
+        return { errors: 'CORS error - please contact support to resolve server configuration.' };
+      }
+      if (error.networkError.message?.includes('Failed to fetch')) {
+        return { errors: 'Network connection failed. Please check your internet connection and try again.' };
+      }
       
       return { 
         errors: `Network error: ${error.networkError.message}` 
@@ -186,6 +220,9 @@ export const signInUser = async (data: SignInData): Promise<AuthResponse> => {
       }
       if (error.message.includes('fetch')) {
         return { errors: 'Network fetch error - unable to reach server' };
+      }
+      if (error.message.includes('Failed to fetch')) {
+        return { errors: 'Connection failed. Please check your internet connection and try again.' };
       }
       
       return { errors: `Error: ${error.message}` };
@@ -215,6 +252,25 @@ export const checkAuth = async (): Promise<AuthResponse> => {
   }
 
   try {
+    // Test basic connectivity first
+    const testResponse = await fetch(process.env.NEXT_PUBLIC_GRAPHQL_URL || 'https://api.myrenewme.com/graphql', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${authToken}`
+      },
+      credentials: 'include',
+      body: JSON.stringify({
+        query: `query { __typename }`
+      })
+    });
+    
+    if (!testResponse.ok) {
+      console.error('❌ Server connectivity test failed:', testResponse.status);
+      localStorage.removeItem('authToken');
+      return { errors: 'Server connection failed. Please try logging in again.' };
+    }
+    
     const response = await client.query({
       query: CHECK_AUTH,
       variables: {authToken: authToken},

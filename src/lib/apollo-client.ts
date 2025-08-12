@@ -1,5 +1,6 @@
 import { ApolloClient, HttpLink, InMemoryCache, from } from '@apollo/client';
 import { onError } from '@apollo/client/link/error';
+import { setContext } from '@apollo/client/link/context';
 
 console.log('🔧 Apollo Client Configuration:');
 console.log('📍 GraphQL URL:', process.env.NEXT_PUBLIC_GRAPHQL_URL);
@@ -26,31 +27,47 @@ const errorLink = onError(({ graphQLErrors, networkError, operation, forward }) 
   }
 });
 
+// Auth link to add token to headers
+const authLink = setContext((_, { headers }) => {
+  const token = typeof window !== 'undefined' ? localStorage.getItem('authToken') : null;
+  
+  return {
+    headers: {
+      ...headers,
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      ...(token && { 'Authorization': `Bearer ${token}` })
+    }
+  };
+});
 // HTTP link
 const httpLink = new HttpLink({
   uri: process.env.NEXT_PUBLIC_GRAPHQL_URL || 'https://api.myrenewme.com/graphql',
-  credentials: 'same-origin',
-  headers: {
-    'Content-Type': 'application/json',
-    ...(typeof window !== 'undefined' && localStorage.getItem('authToken') && {
-      'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-    })
+  credentials: 'include',
+  fetchOptions: {
+    mode: 'cors',
   }
 });
 
 console.log('✅ Apollo Client initialized with URL:', httpLink.options.uri);
 
 // Combine links
-const link = from([errorLink, httpLink]);
+const link = from([errorLink, authLink, httpLink]);
 
 const client = new ApolloClient({
   link: link,
   cache: new InMemoryCache(),
+  connectToDevTools: process.env.NODE_ENV === 'development',
   defaultOptions: {
     watchQuery: {
       errorPolicy: 'all',
+      notifyOnNetworkStatusChange: true,
     },
     query: {
+      errorPolicy: 'all',
+      notifyOnNetworkStatusChange: true,
+    },
+    mutate: {
       errorPolicy: 'all',
     },
   },
